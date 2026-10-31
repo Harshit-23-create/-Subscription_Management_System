@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+*/node_modules
+backend code/node_modules
+
+# Build outputs
+dist
+dist-ssr
+*.local
+backend code/dist
+
+# Environment variables
+.env
+backend code/.env
+
+# Editor directories and files
+.vscode
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+desktop.ini
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript cache
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Test and temporary directories
+coverage
+.nyc_output

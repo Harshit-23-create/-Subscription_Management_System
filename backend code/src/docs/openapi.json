@@ -1,0 +1,250 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Subscription Management System API",
+    "version": "1.0.0",
+    "description": "Production-grade, fully functional REST API for Customers, Products, Plans, Quotations, Subscriptions, Billing, Invoices, Payments, Discounts, Taxes, and Customer Portal."
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "API v1 Base Endpoint"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check endpoint",
+        "tags": ["Health"],
+        "security": [],
+        "responses": {
+          "200": { "description": "System is healthy" }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Authentication"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "firstName", "lastName"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 8 },
+                  "firstName": { "type": "string" },
+                  "lastName": { "type": "string" },
+                  "role": { "type": "string", "enum": ["ADMIN", "STAFF", "CUSTOMER"] },
+                  "customerId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "User created" } }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login and receive JWT tokens",
+        "tags": ["Authentication"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Login successful" } }
+      }
+    },
+    "/auth/profile": {
+      "get": {
+        "summary": "Get authenticated user profile",
+        "tags": ["Authentication"],
+        "responses": { "200": { "description": "Profile data" } }
+      }
+    },
+    "/customers": {
+      "get": {
+        "summary": "List and search customers",
+        "tags": ["Customers"],
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "List of customers" } }
+      },
+      "post": {
+        "summary": "Create customer",
+        "tags": ["Customers"],
+        "responses": { "201": { "description": "Customer created" } }
+      }
+    },
+    "/customers/{id}": {
+      "get": {
+        "summary": "Get customer details and balance",
+        "tags": ["Customers"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Customer details" } }
+      },
+      "put": {
+        "summary": "Update customer",
+        "tags": ["Customers"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Customer updated" } }
+      }
+    },
+    "/products": {
+      "get": { "summary": "List products", "tags": ["Products"], "responses": { "200": { "description": "Products list" } } },
+      "post": { "summary": "Create product", "tags": ["Products"], "responses": { "201": { "description": "Product created" } } }
+    },
+    "/plans": {
+      "get": { "summary": "List plans", "tags": ["Plans"], "responses": { "200": { "description": "Plans list" } } },
+      "post": { "summary": "Create subscription plan", "tags": ["Plans"], "responses": { "201": { "description": "Plan created" } } }
+    },
+    "/quotations": {
+      "get": { "summary": "List quotations", "tags": ["Quotations"], "responses": { "200": { "description": "Quotations list" } } },
+      "post": { "summary": "Create quotation", "tags": ["Quotations"], "responses": { "201": { "description": "Quotation created" } } }
+    },
+    "/quotations/{id}/pdf": {
+      "get": {
+        "summary": "Download quotation PDF",
+        "tags": ["Quotations"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "PDF Stream", "content": { "application/pdf": {} } } }
+      }
+    },
+    "/quotations/{id}/convert-to-invoice": {
+      "post": {
+        "summary": "Convert accepted quotation to invoice",
+        "tags": ["Quotations"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "201": { "description": "Invoice created from quotation" } }
+      }
+    },
+    "/subscriptions": {
+      "get": { "summary": "List subscriptions", "tags": ["Subscriptions"], "responses": { "200": { "description": "Subscriptions list" } } },
+      "post": { "summary": "Create subscription", "tags": ["Subscriptions"], "responses": { "201": { "description": "Subscription created" } } }
+    },
+    "/subscriptions/{id}/renew": {
+      "post": {
+        "summary": "Renew subscription for next cycle",
+        "tags": ["Subscriptions"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Subscription renewed" } }
+      }
+    },
+    "/subscriptions/{id}/pause": {
+      "post": {
+        "summary": "Pause active subscription",
+        "tags": ["Subscriptions"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Subscription paused" } }
+      }
+    },
+    "/subscriptions/{id}/resume": {
+      "post": {
+        "summary": "Resume paused subscription",
+        "tags": ["Subscriptions"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Subscription resumed" } }
+      }
+    },
+    "/subscriptions/{id}/cancel": {
+      "post": {
+        "summary": "Cancel subscription",
+        "tags": ["Subscriptions"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Subscription canceled" } }
+      }
+    },
+    "/invoices": {
+      "get": { "summary": "List invoices", "tags": ["Invoices"], "responses": { "200": { "description": "Invoices list" } } },
+      "post": { "summary": "Create manual invoice", "tags": ["Invoices"], "responses": { "201": { "description": "Invoice created" } } }
+    },
+    "/invoices/{id}/pdf": {
+      "get": {
+        "summary": "Download invoice PDF",
+        "tags": ["Invoices"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "PDF Stream", "content": { "application/pdf": {} } } }
+      }
+    },
+    "/payments": {
+      "get": { "summary": "List payments", "tags": ["Payments"], "responses": { "200": { "description": "Payments list" } } },
+      "post": { "summary": "Record payment against invoice", "tags": ["Payments"], "responses": { "201": { "description": "Payment recorded" } } }
+    },
+    "/payments/{id}/refund": {
+      "post": {
+        "summary": "Refund payment",
+        "tags": ["Payments"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Refund processed" } }
+      }
+    },
+    "/payments/{id}/receipt": {
+      "get": {
+        "summary": "Download payment receipt PDF",
+        "tags": ["Payments"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Receipt PDF Stream", "content": { "application/pdf": {} } } }
+      }
+    },
+    "/portal/dashboard": {
+      "get": { "summary": "Customer portal dashboard summary", "tags": ["Customer Portal"], "responses": { "200": { "description": "Portal dashboard" } } }
+    },
+    "/portal/subscriptions": {
+      "get": { "summary": "Customer view own subscriptions", "tags": ["Customer Portal"], "responses": { "200": { "description": "Customer subscriptions" } } }
+    },
+    "/portal/invoices": {
+      "get": { "summary": "Customer view own invoices", "tags": ["Customer Portal"], "responses": { "200": { "description": "Customer invoices" } } }
+    },
+    "/portal/invoices/{id}/pdf": {
+      "get": { "summary": "Customer download invoice PDF", "tags": ["Customer Portal"], "responses": { "200": { "description": "PDF stream" } } }
+    },
+    "/analytics/summary": {
+      "get": { "summary": "Executive KPI summary (MRR, ARR, Churn, Revenue)", "tags": ["Analytics & Reports"], "responses": { "200": { "description": "KPI metrics" } } }
+    },
+    "/analytics/revenue": {
+      "get": { "summary": "Revenue breakdown over time", "tags": ["Analytics & Reports"], "responses": { "200": { "description": "Revenue trends" } } }
+    },
+    "/notifications": {
+      "get": { "summary": "Get user notifications", "tags": ["Notifications"], "responses": { "200": { "description": "List of notifications" } } }
+    },
+    "/audit-logs": {
+      "get": { "summary": "Query audit logs (Admin only)", "tags": ["Audit Logs"], "responses": { "200": { "description": "Audit trail" } } }
+    }
+  }
+}
+
